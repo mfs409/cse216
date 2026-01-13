@@ -12,10 +12,10 @@ permissions:
   pages: write
   id-token: write
 
-# No concurrent deployments; no cancelling in-progress deployments on a re-push
+# No concurrent deployments; cancel in-progress deployments on a re-push
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   # Job for building the static site
