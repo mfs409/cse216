@@ -1,0 +1,7 @@
+c clear
+L ~/cse216 $ 
+C ssh -t dokku@dokku.cse.lehigh.edu 'config:export quickstart'
+e Enter
+X ssh -t dokku@ubuquickstdev01.cse.lehigh.edu 'config:export quickstart' 2>&1 | sed "s/SECRET=.*/SECRET='xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'/" | sed "s/quickstart.ubuquickstdev01/dokku/" | sed "s|postgres://.*@|postgres://postgres:10101010101010101010101010101010@|" | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/cse216  $ 
+S sleep 15

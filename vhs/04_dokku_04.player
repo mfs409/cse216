@@ -1,0 +1,180 @@
+c clear
+L ~ $ 
+C cd dokku-tutorial
+e Enter
+S cd ../../dokku-tutorial
+L ~/dokku-tutorial $ 
+C git status
+e Enter
+E On branch main
+E 
+E No commits yet
+E 
+E Untracked files:
+e Enter
+E   (use "git add <file>..." to include in what will be committed)
+E         .static
+E         index.html
+E 
+E nothing added to commit but untracked files present (use "git add" to track)
+L ~/dokku-tutorial $ 
+C git add .static index.html
+e Enter
+L ~/dokku-tutorial $ 
+C git commit -m "Created a simple static site, to test Dokku"
+e Enter
+E [main (root-commit) da0b0bf] Created a simple static site, to test Dokku
+E  2 files changed, 6 insertions(+)
+E  create mode 100644 .static
+E  create mode 100644 index.html
+L ~/dokku-tutorial $ 
+C git push
+e Enter
+E Enumerating objects: 4, done.
+S sleep 1
+E Counting objects: 100% (4/4), done.
+S sleep 1
+E Delta compression using up to 16 threads
+S sleep 1
+E Compressing objects: 100% (3/3), done.
+S sleep 1
+E Writing objects: 100% (4/4), 390 bytes | 390.00 KiB/s, done.
+S sleep 1
+E Total 4 (delta 0), reused 0 (delta 0), pack-reused 0
+S sleep 1
+E -----> Set main as deploy-branch
+S sleep 1
+E -----> Cleaning up...
+S sleep 1
+E -----> Building quickstart from herokuish
+S sleep 1
+E -----> Adding BUILD_ENV to build environment...
+S sleep 1
+E        BUILD_ENV added successfully
+S sleep 1
+E -----> .static app detected
+S sleep 1
+E -----> Copy static files to www
+S sleep 1
+E -----> Download and unzip nginx 1.26.2 via http
+S sleep 1
+E -----> Download and unzip pcre 10.42 via http
+S sleep 1
+E -----> Download and unzip zlib 1.3 via http
+S sleep 1
+E -----> Download and unzip sigil 0.10.1 via http
+S sleep 1
+E -----> Compiling static nginx binary
+S sleep 1
+E        /usr/bin/ld: objs/src/core/nginx.o: in function `ngx_load_module':
+S sleep 1
+E        /cache/nginx-1.26.2/src/core/nginx.c:1609:(.text+0xb2): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+S sleep 1
+L        /usr/bin/ld: objs/src/core/nginx.o: in function `ngx_core_module_init_conf':
+S sleep 1
+L        /cache/nginx-1.26.2/src/core/nginx.c:1204:(.text+0x55d): warning: Using 'getgrnam' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+S sleep 1
+E        /usr/bin/ld: objs/src/os/unix/ngx_process_cycle.o: in function `ngx_worker_process_init':
+S sleep 1
+E        /cache/nginx-1.26.2/src/os/unix/ngx_process_cycle.c:807:(.text+0xa2f): warning: Using 'initgroups' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+S sleep 1
+E        /usr/bin/ld: objs/src/core/ngx_inet.o: in function `ngx_inet_resolve_host':
+S sleep 1
+E        /cache/nginx-1.26.2/src/core/ngx_inet.c:1137:(.text+0xd48): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+S sleep 1
+E        /usr/bin/ld: objs/src/core/nginx.o: in function `ngx_core_module_init_conf':
+S sleep 1
+E        /cache/nginx-1.26.2/src/core/nginx.c:1193:(.text+0x536): warning: Using 'getpwnam' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+S sleep 1
+E -----> Using default app-nginx.conf.sigil
+S sleep 1
+E -----> Using default mime.types
+S sleep 1
+E -----> Discovering process types
+S sleep 1
+E        Default types for  -> web
+S sleep 1
+E -----> Releasing quickstart...
+S sleep 1
+E -----> Checking for predeploy task
+S sleep 1
+E        No predeploy task found, skipping
+S sleep 1
+E -----> Checking for release task
+S sleep 1
+E        No release task found, skipping
+S sleep 1
+E -----> Checking for first deploy postdeploy task
+S sleep 1
+E        No first deploy postdeploy task found, skipping
+S sleep 1
+E =====> Processing deployment checks
+S sleep 1
+E remote:  !     No healthchecks found in app.json for web process type
+S sleep 1
+E        No web healthchecks found in app.json. Simple container checks will be performed.
+S sleep 1
+E        For more efficient zero downtime deployments, add healthchecks to your app.json. See https://dokku.com/docs/deployment/zero-downtime-deploys/ for examples
+S sleep 1
+E -----> Deploying quickstart via the docker-local scheduler...
+S sleep 1
+E -----> Deploying web (count=1)
+S sleep 1
+E        Attempting pre-flight checks (web.1)
+S sleep 1
+E -----> Executing 2 healthchecks
+S sleep 1
+E        Running healthcheck name='default' type='uptime' uptime=10
+S sleep 1
+E        Running healthcheck name='port listening check' attempts=3 port=5000 retries=2 timeout=5 type='listening' wait=5
+S sleep 1
+E        Healthcheck succeeded name='port listening check'
+S sleep 1
+E        Healthcheck succeeded name='default'
+S sleep 1
+E        All checks successful (web.1)
+S sleep 1
+E =====> Start of quickstart container output (80fb69caf600 web.1)
+S sleep 1
+E =====> End of quickstart container output (80fb69caf600 web.1)
+S sleep 1
+E =====> Triggering early nginx proxy rebuild
+S sleep 1
+E -----> Ensuring network configuration is in sync for quickstart
+S sleep 1
+E -----> Configuring quickstart.dokku.cse.lehigh.edu...(using built-in template)
+S sleep 1
+E -----> Creating http nginx.conf
+S sleep 1
+E        Reloading nginx
+S sleep 1
+E -----> Running post-deploy
+S sleep 1
+E -----> Ensuring network configuration is in sync for quickstart
+S sleep 1
+E -----> Configuring quickstart.dokku.cse.lehigh.edu...(using built-in template)
+S sleep 1
+E -----> Creating http nginx.conf
+S sleep 1
+E        Reloading nginx
+S sleep 1
+E -----> Renaming containers
+S sleep 1
+E        Renaming container quickstart.web.1.upcoming-19658 (80fb69caf600) to quickstart.web.1
+S sleep 1
+E -----> Checking for postdeploy task
+S sleep 1
+E        No postdeploy task found, skipping
+S sleep 1
+E =====> Application deployed:
+S sleep 1
+E        http://quickstart.dokku.cse.lehigh.edu
+S sleep 1
+E   
+S sleep 1
+E To dokku.cse.lehigh.edu:quickstart
+S sleep 1
+E  * [new branch]      main -> main
+S sleep 1
+L ~/dokku-tutorial  $ 
+S sleep 15

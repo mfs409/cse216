@@ -1,0 +1,25 @@
+c clear
+S rm -rf ../../tmp_sweng_tmp
+S mkdir ../../tmp_sweng_tmp
+S cd ../../tmp_sweng_tmp
+L ~ $ 
+C git clone dokku@dokku.cse.lehigh.edu:quickstart dokku-tutorial
+e Enter
+X git clone dokku@ubuquickstdev01.cse.lehigh.edu:quickstart dokku-tutorial 2>&1 | grep -v Pseudo-terminal
+L ~ $ 
+C cd dokku-tutorial
+e Enter
+L ~/dokku-tutorial $ 
+C ls -a
+e Enter
+X cd dokku-tutorial && ls -a
+L ~/dokku-tutorial $ 
+C git remote -v
+e Enter
+X cd dokku-tutorial && git remote -v 2>&1 | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/dokku-tutorial $ 
+C cd ..
+e Enter
+X cd .. && rm -rf tmp_sweng_tmp
+L ~  $ 
+S sleep 15

@@ -1,0 +1,7 @@
+c clear
+L ~ $ 
+C psql postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart:11111/quickstart
+e Enter
+X psql `ssh -t -q dokku@ubuquickstdev01.cse.lehigh.edu 'config:get quickstart DATABASE_URL'` 2>&1 | sed 's/ubuquickstdev01/dokku/'
+L ~/  $ 
+S sleep 15

@@ -1,0 +1,16 @@
+c clear
+L ~/cse216/admin $ 
+C DATABASE_URL=postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart.dokku.cse.lehigh.edu:13543/quickstart java -jar target/admin-1.0.jar
+e Enter
+E Using the following environment variables:
+E ---------------------------------------------
+E   DB_FILE=null
+E   DATABASE_URL=postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart.dokku.cse.lehigh.edu:13543/quickstart
+E ---------------------------------------------
+E java.sql.SQLException: No suitable driver found for postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart.dokku.cse.lehigh.edu:13543/quickstart
+E         at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:708)
+E         at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:253)
+E         at quickstart.admin.Database.<init>(Database.java:60)
+E         at quickstart.admin.App.main(App.java:31)
+L ~/cse216/admin  $ 
+S sleep 15

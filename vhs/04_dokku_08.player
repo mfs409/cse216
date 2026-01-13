@@ -1,0 +1,16 @@
+c clear
+L ~/cse216/admin $ 
+C DATABASE_URL=postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart.dokku.cse.lehigh.edu:13543/quickstart java -jar target/admin-1.0.jar
+e Enter
+E Using the following environment variables:
+E ---------------------------------------------
+E   DB_FILE=null
+E   DATABASE_URL=postgres://postgres:01010101010101010101010101010101@dokku-postgres-quickstart.dokku.cse.lehigh.edu:13543/quickstart
+E ---------------------------------------------
+L [-m, +m, C, -p, *m, D, +p, *p, ~m, q, ~p, 1m, 1p, ?] :> 
+C q
+e Enter
+L ~/cse216/admin  $ 
+S sleep 15
+
+

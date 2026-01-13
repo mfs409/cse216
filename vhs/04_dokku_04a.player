@@ -1,0 +1,36 @@
+c clear
+L ~/dokku-tutorial $ 
+C git rm .static index.html
+e Enter
+E rm '.static'
+E rm 'index.html'
+L ~/dokku-tutorial $ 
+C git commit -m "removed static site, so repository is ready for launching the Javalin-based backend"
+e Enter
+E [main a134542] removed static site, so repository is ready for launching the Javalin-based backend
+E  2 files changed, 6 deletions(-)
+E  delete mode 100644 .static
+E  delete mode 100644 index.html
+L ~/dokku-tutorial $ 
+C git push
+e Enter
+S sleep 1
+E Enumerating objects: 3, done.
+E Counting objects: 100% (3/3), done.
+E Delta compression using up to 16 threads
+E Compressing objects: 100% (1/1), done.
+E Writing objects: 100% (2/2), 247 bytes | 247.00 KiB/s, done.
+E Total 2 (delta 0), reused 0 (delta 0), pack-reused 0
+E -----> Cleaning up...
+E -----> Building quickstart from herokuish
+E -----> Adding BUILD_ENV to build environment...
+E        BUILD_ENV added successfully
+E -----> Unable to select a buildpack
+E remote:  !     Failure during app build
+E remote:  !     Retagging old image 5e8269a4ceee as dokku/quickstart:latest
+E remote:  !     App build failed
+E To ubuquickstdev01.cse.lehigh.edu:quickstart
+E  ! [remote rejected] main -> main (pre-receive hook declined)
+E error: failed to push some refs to 'ubuquickstdev01.cse.lehigh.edu:quickstart'
+L ~/dokku-tutorial  $ 
+S sleep 15

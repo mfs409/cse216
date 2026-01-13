@@ -1,0 +1,22 @@
+# Load default configuration, then adjust the height of the output file
+Source config.tape
+Set Height 150
+
+# Launch the container.  Always clean the folder *before* entering the
+# container, so that we're more confident that the path is correct.
+Hide
+Type 'rm -rf ~/Desktop/sweng/dev/*' Enter
+Type './run_docker.sh' Enter
+Type 'clear' Enter
+Wait /\$/
+
+# Always start by going into the folder, as a reminder to the student
+Show
+Sleep 1s
+Type 'cd ~/cse216'
+Sleep 1s
+Enter
+Type 'sqlite3 db.db'
+Sleep 1s
+Enter
+Sleep 3s

@@ -1,0 +1,56 @@
+/* Modify the width of the center pane */
+:root {
+    --vp-layout-max-width: 1920px;
+}
+
+.VPDoc:not(.has-sidebar) .container {
+    max-width: 1584px !important;
+}
+
+.VPDoc:not(.has-sidebar) .content {
+    max-width: 1264px !important;
+}
+
+.VPDoc.has-aside .content-container {
+    max-width: 1168px !important;
+}
+
+/* Keep the "informational" code groups from getting too big */
+/* .vp-code-group .vp-code-block pre, */
+div.blocks {
+    max-height: 400px;
+    /* Adjust as needed */
+    overflow-y: auto;
+}
+
+:root {
+    /* Brand colors (used for links, primary buttons, etc.) */
+    --vp-c-brand-1: #653819;
+    /* Primary brand color */
+    --vp-c-brand-2: #b9975b;
+    --vp-c-brand-3: #653819;
+
+    /* Text colors */
+    --vp-c-text-1: #000000;
+    /* Primary text color */
+    --vp-c-text-2: #000000;
+    --vp-c-text-3: #653819;
+
+    --vp-custom-block-warning-bg: var(--vp-c-brand-2);
+    --vp-custom-block-tip-bg: var(--vp-c-brand-2);
+}
+
+div.warning {
+    background-color: #ff0000;
+}
+
+/*
+ brown 653819
+ yellow fed141
+ red c8102e
+ brown2 833921
+ tan b9975b
+ green 046c3a
+ white ffffff
+ black 000000
+ */

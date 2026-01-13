@@ -1,0 +1,19 @@
+c clear
+L ~/cse216 $ 
+C ssh -t dokku@dokku.cse.lehigh.edu 'config:set quickstart DATABASE_FILE=db.db'
+e Enter
+X ssh -t dokku@ubuquickstdev01.cse.lehigh.edu 'config:set quickstart DATABASE_FILE=db.db' 2>&1 | sed "s/SECRET=.*/SECRET='xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'/" | sed "s/quickstart.ubuquickstdev01/dokku/" | sed "s|postgres://.*@|postgres://postgres:10101010101010101010101010101010@|" | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/cse216 $ 
+C ssh -t dokku@dokku.cse.lehigh.edu 'config:export quickstart'
+e Enter
+X ssh -t dokku@ubuquickstdev01.cse.lehigh.edu 'config:export quickstart' 2>&1 | sed "s/SECRET=.*/SECRET='xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'/" | sed "s/quickstart.ubuquickstdev01/dokku/" | sed "s|postgres://.*@|postgres://postgres:10101010101010101010101010101010@|" | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/cse216 $ 
+C ssh -t dokku@dokku.cse.lehigh.edu 'config:unset quickstart DATABASE_FILE'
+e Enter
+X ssh -t dokku@ubuquickstdev01.cse.lehigh.edu 'config:unset quickstart DATABASE_FILE' 2>&1 | sed "s/SECRET=.*/SECRET='xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'/" | sed "s/quickstart.ubuquickstdev01/dokku/" | sed "s|postgres://.*@|postgres://postgres:10101010101010101010101010101010@|" | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/cse216 $ 
+C ssh -t dokku@dokku.cse.lehigh.edu 'config:export quickstart'
+e Enter
+X ssh -t dokku@ubuquickstdev01.cse.lehigh.edu 'config:export quickstart' 2>&1 | sed "s/SECRET=.*/SECRET='xxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx'/" | sed "s/quickstart.ubuquickstdev01/dokku/" | sed "s|postgres://.*@|postgres://postgres:10101010101010101010101010101010@|" | sed 's/ubuquickstdev01/dokku/' | grep -v Pseudo-terminal
+L ~/cse216  $ 
+S sleep 15

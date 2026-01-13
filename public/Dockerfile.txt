@@ -1,0 +1,11 @@
+FROM alpine:latest
+
+# Update everything
+RUN apk update --no-cache
+RUN apk upgrade --no-cache
+
+# Set up all required programs and libraries
+RUN apk add --no-cache openjdk21-jdk bash git maven nodejs-lts npm sqlite curl postgresql
+
+# You can build this container like this:
+#   docker build -t cse216 .

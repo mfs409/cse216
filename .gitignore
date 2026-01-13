@@ -1,0 +1,8 @@
+local/
+*.env
+*.db
+.cache
+.vscode
+node_modules/
+target/
+dist

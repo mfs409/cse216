@@ -1,0 +1,25 @@
+# NB: This is what 04_dokku_04 *should* be doing, but instead we're
+# hardcoding the output, because it's not working nicely.
+c clear
+L ~ $ 
+C cd dokku-tutorial
+e Enter
+S cd ../../dokku-tutorial
+L ~/dokku-tutorial $ 
+C git status
+X git status
+e Enter
+L ~/dokku-tutorial $ 
+C git add .static index.html
+X git add .static index.html
+e Enter
+L ~/dokku-tutorial $ 
+C git commit -m "Created a simple static site, to test Dokku"
+e Enter
+X git commit -m "Created a simple static site, to test Dokku"
+L ~/dokku-tutorial $ 
+C git push
+e Enter
+X git push
+L ~/dokku-tutorial  $ 
+S sleep 15
