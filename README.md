@@ -3,6 +3,8 @@
 This repository hosts the revised (Spring 2026) tutorial for CSE 216: Software Engineering.
 This tutorial aims to provide a *quick* on-ramp that covers the basic technologies (the "tech stack") used in CSE 216.
 
+The latest version of this tutorial will always be available at <https://mfs409.github.io/cse216/>
+
 The tech stack covered by this tutorial is sufficient for building a scalable web application.
 It consists of a database (initially SQLite, eventually PostgreSQL), a command-line program for managing the database (written in Java), a web server (written in Java, using the Javalin framework), and a web front end (using Vue.js and TypeScript).
 These technologies were chosen because they balance pedagogical needs, diverse student backgrounds, and the goals of CSE 216.
