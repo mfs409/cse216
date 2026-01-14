@@ -4,6 +4,7 @@
   "description": "Sources for generating the CSE 216 Quick-Start Tutorials static website",
   "license": "MIT",
   "author": "",
+  "type": "module",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
