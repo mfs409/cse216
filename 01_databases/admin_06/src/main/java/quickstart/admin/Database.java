@@ -262,12 +262,10 @@ public class Database implements AutoCloseable {
         Database.validateEmail(email);
         Database.validateName(name);
 
-        // Even though this is "demonstration" code, and not actually something
-        // you'd want to have in a real system, it's important for it to be
-        // correct. The issue is that technically, this code can change a user's
-        // email address. When inserting, the code ensured that emails were
-        // unique, using a transaction. That effort is useless unless this code
-        // also enforces uniqueness. Hence a transaction is needed here, too.
+        // We could rely on the database to enforce email uniqueness,
+        // (and are, through the `UNIQUE` constraint on `email`), but we instead
+        // use a *transaction* to check the uniqueness of the address
+        // before updating so we can provide nicer error messages
         conn.setAutoCommit(false);
 
         try (var stmt = conn.prepareStatement("SELECT * FROM tblPerson WHERE email = ? and id <> ?");) {

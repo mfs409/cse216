@@ -419,7 +419,7 @@ To find the latest versions of plugins and dependencies, visit the [Maven Packag
 From there, find the driver for SQLite (JDBC provided by `org.xerial`), select the latest version, and from the "Maven" tab copy the dependency into the `<dependencies>` section (not the `<dependencyManagement>` section).
 The addition to `pom.xml` is highlighted below:
 
-<<< @/01_databases/admin_03/pom.xml#sqlite_dep{2-6}
+<<< @/01_databases/admin_03/pom.xml#sqlite_dep{2-7}
 
 A nice outcome is that Maven won't just install the Java code for interacting with Maven.
 It will also install a local copy of SQLite for your program to use.
@@ -491,7 +491,7 @@ Once the insert code makes sense, deleting should be not be too hard to understa
 
 Updating is a bit trickier.
 The issue is that you're going to want to provide a good error message if the user tries to change their email address to an address that is already taken.
-While you could rely on the database to enforce this, using a *transaction* to check the uniqueness of the address before updating it enables nicer error messages:
+While you could rely on the database to enforce this (and are, through the `UNIQUE` constraint on `email` when creating the table), using a *transaction* to check the uniqueness of the address before updating it enables nicer error messages:
 
 <<< @/01_databases/admin_05/src/main/java/quickstart/admin/Database.java#update_person
 
@@ -603,8 +603,10 @@ Run it, and you will see something like this in the output:
 
 Notice that the example uses a different `DB_FILE` than the one used for the "production" run of the program in Chapter 1.11.
 Since the tests run automatically, you will need to be **very careful** not to let your tests accidentally overwrite the database you use for the production version of your program, especially once your app is live at the end of Chapter 2.
+The unit test code provided does so by changing the given filename so it includes the `System.currentTimeMillis()`, minimizing the likelihood of name collisions.
 
 As a final step, you should try adding invalid tests to `AppTest.java` to see what happens when a test fails.
+And, because the testing code prints more output during testing than desirable you may remove the "chatty" `System.out.println` statements when comfortable with how things are working; the verbose output is only included to help you understand the behavior of the provided unit tests.
 
 ## 1.13. Finishing Up
 
@@ -626,9 +628,9 @@ First, make sure your code matches the code below:
 <<< @/01_databases/admin/src/test/java/quickstart/admin/AppTest.java
 :::
 
-Second, run your program to create a file called `db/db.db`.
+Second, run your program to create a file called `../db.db`.
 Create tables and views in the file, and then use `+p` to add yourself to `tblPerson`.
-Be sure to use your gmail-managed email account, or you won't be able to test logging in:
+Be sure to use your gmail-managed `@lehigh` email account, or you won't be able to test logging in:
 
 ![Preparing your database for Chapter 2](../vhs/01_wrapup_01.gif)
 
