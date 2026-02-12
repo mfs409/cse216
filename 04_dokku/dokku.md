@@ -6,12 +6,44 @@ outline: deep
 
 ## 4.1. Introduction
 
-The Lehigh CSE department hosts private a [Dokku](https://dokku.com/) instance that you can use to deploy your application.
+The Lehigh CSE department hosts a private [Dokku](https://dokku.com/) instance that you can use to deploy your application.
 Dokku is an open-source *Platform as a Service* ([PaaS](https://en.wikipedia.org/wiki/Platform_as_a_service)) provider that is similar to [Heroku](https://www.heroku.com/).
 The instructions in this chapter should not need many changes in order to work with Heroku or other Heroku-like cloud PaaS providers.
 
 The changes you'll make to your app in this chapter help to align with the [12 Factor App](https://12factor.net/) principles.
 12-factor is, in effect, a *pattern* for DevOps, similar to the way that there are [Software Design Patterns](https://en.wikipedia.org/wiki/Software_design_pattern).
+
+:::warning Warning: Use *your* project name rather than `quickstart`!
+In this tutorial, wherever you see `quickstart` as the project name, you should (nearly always) replace it with the project name you chose or was given to you.
+The only exception to that rule may be your java package name (i.e. `package quickstart.backend;`), unless you also changed that (e.g. to use your team name).
+
+For example, assume your project name on dokku is of the form   
+`<year><sp|fa>-tutorial-<uid>`, as in  
+`2026sp-tutorial-sml3`.  
+
+Then, wherever you see `quickstart` as the dokku project name, you would instead use your project name.[^qs_examples]
+:::
+
+[^qs_examples]:
+    For example with name `2026sp-tutorial-sml3`:
+
+    - `http://quickstart.dokku.cse.lehigh.edu`
+        - becomes `http://2026sp-tutorial-sml3.dokku.cse.lehigh.edu`
+    - `ssh -t dokku@dokku.cse.lehigh.edu 'config:export quickstart'`
+        - becomes `ssh -t dokku@dokku.cse.lehigh.edu 'config:export 2026sp-tutorial-sml3'`
+    - `ssh -t dokku@dokku.cse.lehigh.edu 'config:set quickstart DATABASE_FILE=db.db'`
+        - becomes `ssh -t dokku@dokku.cse.lehigh.edu 'config:set 2026sp-tutorial-sml3 DATABASE_FILE=db.db'`
+    - `ssh -t dokku@dokku.cse.lehigh.edu 'config:unset quickstart DATABASE_FILE'`
+        - becomes `ssh -t dokku@dokku.cse.lehigh.edu 'config:unset 2026sp-tutorial-sml3 DATABASE_FILE'`
+    - `git clone dokku@dokku.cse.lehigh.edu:quickstart dokku-tutorial`
+        - becomes `git clone dokku@dokku.cse.lehigh.edu:2026sp-tutorial-sml3 dokku-tutorial`
+    - `ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:expose quickstart'`
+        - becomes `ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:expose 2026sp-tutorial-sml3'`
+    - `ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:unexpose quickstart'`
+        - becomes `ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:unexpose 2026sp-tutorial-sml3'`
+    - `ssh -t dokku@dokku.cse.lehigh.edu 'logs quickstart'`
+        - becomes `ssh -t dokku@dokku.cse.lehigh.edu 'logs 2026sp-tutorial-sml3'`
+    - ... and so on
 
 ## 4.2. Why Isn't The Code Ready To Deploy?
 
@@ -38,7 +70,6 @@ When you're done, you'll have made a bunch of one-time fixes to your code, and y
 
 If you are taking CSE 216, you should have been instructed to work with the CSE Department System Administration Staff to set up your *ssh keys* with the Dokku server.[^Dokku_Admin_Note]
 After that, you should have been given a name for your project on one of the Dokku servers.
-You should also have been given a special "exposed database port" number.
 As you work through this chapter, please note that the CSE Dokku servers are only accessible from within the Lehigh network or VPN.
 
 [^Dokku_Admin_Note]:
@@ -394,9 +425,16 @@ When you do, be sure to note the new port!
 ## 4.7. OAuth Adjustments
 
 Since the application is going to be visible as `https://quickstart.dokku.cse.lehigh.edu`, you need to update your Google OAuth configuration.
+
 Log into the [Google Cloud Console](https://console.cloud.google.com/), locate your app, and navigate to the OAuth screen ("APIs & Services" -> "Credentials" -> Vue App client ID).
-Add the origins `https://quickstart.dokku.cse.lehigh.edu` and `http://quickstart.dokku.cse.lehigh.edu`.
-Then add the redirects `https://quickstart.dokku.cse.lehigh.edu/auth/google/callback` and `http://quickstart.dokku.cse.lehigh.edu/auth/google/callback`.
+
+Add the origins
+* `https://quickstart.dokku.cse.lehigh.edu` and
+* `http://quickstart.dokku.cse.lehigh.edu`.
+
+Then add the redirects
+* `https://quickstart.dokku.cse.lehigh.edu/auth/google/callback` and
+* `http://quickstart.dokku.cse.lehigh.edu/auth/google/callback`.
 
 When your app is live, you might decide to remove the `localhost` origin and callback.
 For now, they're worth keeping in place since there's more development work to be done.
