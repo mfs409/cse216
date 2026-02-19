@@ -15,7 +15,10 @@ The changes you'll make to your app in this chapter help to align with the [12 F
 
 :::warning Warning: Use *your* project name rather than `quickstart`!
 In this tutorial, wherever you see `quickstart` as the project name, you should (nearly always) replace it with the project name you chose or was given to you.
-The only exception to that rule may be your java package name (i.e. `package quickstart.backend;`), unless you also changed that (e.g. to use your team name).
+
+The only exceptions to this rule may be
+1. in your database url (i.e. the final portion must use underscores rather than dashes), and 
+2. your java package name (i.e. `package quickstart.backend;`, if you changed that to use your team name.
 
 For example, assume your project name on dokku is of the form   
 `<year><sp|fa>-tutorial-<uid>`, as in  
@@ -261,20 +264,33 @@ However, if you try to use it to connect to your database, using the `DATABASE_U
 
 ![Failed attempt to connect via psql](../vhs/04_dokku_05.gif)
 
-It turns out that there are two problems here.
-The first is that you need to provide a more exact name for the database when you're trying to connect to it from your laptop.
-Instead of `dokku-postgres-quickstart`, you'll need to type the full name `dokku-postgres-quickstart.dokku.cse.lehigh.edu`.
-But if you change this, you'll just get a "Connection timed out" error, because there is another issue.
-By default, your database is not visible to any program other than your app on the Dokku server.
-To make it visible, you need to expose a port.
-The default PostgreSQL port is 5432, but since the Dokku server is used by many people simultaneously, you can't use that port.
-Instead, you will run a command to expose the port and receive an automatically assigned available external port:
+It turns out that there are two problems here:
+1. The first is that you need to provide a more exact name for the database when you're trying to connect to it from your laptop.
+    * Instead of `dokku-postgres-quickstart`, you'll need to type the full name `dokku-postgres-quickstart.dokku.cse.lehigh.edu`.
+    * But if you change this, you'll just get a "Connection timed out" error, because there is another issue...
+2. By default, your database is not visible to any program other than your app on the Dokku server.
+    * To make it visible, you need to expose a port.
+    * The default PostgreSQL port is `5432`, but since the Dokku server is used by many people simultaneously, you can't use that port.
+
+Instead of using the default port, you will run a command to expose the port and receive an automatically assigned available external port:
 
 ```bash
 ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:expose quickstart'
 ```
 
+And, depending upon how the dokku host is configured, you should be able to see the full URL to modify by running:
+
+```bash
+ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:info quickstart'
+```
+
 Then you can build a valid URI for accessing your database.
+If your appname has dashes in it (e.g. `2026sp-tutorial-uid123`), you will have to change the final portion of the url to use underscores instead, for example:
+
+```bash
+postgres://postgres:abcdefghijklmnopqrstuvwxyz123456@dokku-postgres-2026sp-tutorial-uid123:13543/2026sp_tutorial_uid123
+```
+
 From within `psql`, you can press `ctrl-d` or type `\q` to exit:
 The whole process should look like this:
 

@@ -630,7 +630,7 @@ First, make sure your code matches the code below:
 
 Second, run your program to create a file called `../db.db`.
 Create tables and views in the file, and then use `+p` to add yourself to `tblPerson`.
-Be sure to use your gmail-managed `@lehigh` email account, or you won't be able to test logging in:
+Be sure to use your gmail-managed `@lehigh.edu` email account, or you won't be able to test logging in:
 
 ![Preparing your database for Chapter 2](../vhs/01_wrapup_01.gif)
 
