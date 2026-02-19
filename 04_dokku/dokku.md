@@ -288,7 +288,7 @@ Then you can build a valid URI for accessing your database.
 If your appname has dashes in it (e.g. `2026sp-tutorial-uid123`), you will have to change the final portion of the url to use underscores instead, for example:
 
 ```bash
-postgres://postgres:abcdefghijklmnopqrstuvwxyz123456@dokku-postgres-2026sp-tutorial-uid123:13543/2026sp_tutorial_uid123
+postgres://postgres:abcdefghijklmnopqrstuvwxyz123456@dokku-postgres-2026sp-tutorial-uid123.dokku.cse.lehigh.edu:13543/2026sp_tutorial_uid123
 ```
 
 From within `psql`, you can press `ctrl-d` or type `\q` to exit:
