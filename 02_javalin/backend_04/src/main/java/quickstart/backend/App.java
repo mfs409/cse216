@@ -1,6 +1,7 @@
 package quickstart.backend;
 
 import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
 import java.sql.SQLException;
 
 import com.google.gson.*;
@@ -54,6 +55,15 @@ public class App {
         // This date format works nicely with SQLite and PostgreSQL
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
+        // #region sessions
+        // NB: `Sessions` makes the back end stateful. This should get migrated
+        // to a separate component, such as a memcache, so that it's possible to
+        // scale out the backend to multiple servers without users getting
+        // accidental logouts.
+        var sessions = new Sessions();
+        var gOAuth = new GoogleOAuth(serverName, port, clientId, clientSecret, Routes.RT_AUTH_GOOGLE_CALLBACK);
+        // #endregion sessions
+
         // Create the web server. This doesn't start it yet!
         var app = Javalin.create(config -> {
             // Attach a logger
@@ -66,49 +76,40 @@ public class App {
                 if (ctx.body().length() > 0)
                     System.out.printf("request body:%s%n", ctx.body());
             });
+
+            // #region before
+            // Every interaction with the server requires the user to be authenticated
+            config.routes.before(ctx -> {
+                // To avoid an infinite loop, we don't cry havoc if the user is in
+                // the middle of an auth flow
+                if (ctx.url().equals(gOAuth.redirectUri)) {
+                    System.out.println(">>>>>>> SETTING UP A NEW SESSION, at " + gOAuth.redirectUri);
+                    return;
+                }
+                String gId = ctx.cookie("auth.gId");
+                String key = ctx.cookie("auth.key");
+                // We also don't cry havoc if the user is logged in
+                if (sessions.checkValid(gId, key)) {
+                    return;
+                }
+                System.out.println(">>>>>>> INVALID SESSION, redirecting to " + gOAuth.newAuthUrl);
+                ctx.redirect(gOAuth.newAuthUrl);
+            });
+            // #endregion before
+
+            // All routes go here
+            config.routes.apiBuilder(() -> {
+                // #region new_routes
+                // Handle Google oauth by extracting the "code" and authenticating it, then redirecting
+                get(Routes.RT_AUTH_GOOGLE_CALLBACK,
+                    ctx -> Routes.authCallback(ctx, db, gson, sessions, gOAuth));
+                // Log out
+                get("/logout", ctx -> Routes.authLogout(ctx, gson, sessions));
+                // #endregion new_routes
+                // Get a list of all the people in the system
+                get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
+            });
         });
-
-        // #region sessions
-        // NB: `Sessions` makes the back end stateful. This should get migrated
-        // to a separate component, such as a memcache, so that it's possible to
-        // scale out the backend to multiple servers without users getting
-        // accidental logouts.
-        var sessions = new Sessions();
-        var gOAuth = new GoogleOAuth(serverName, port, clientId, clientSecret, Routes.RT_AUTH_GOOGLE_CALLBACK);
-        // #endregion sessions
-
-        // #region before
-        // Every interaction with the server requires the user to be
-        // authenticated
-        app.before(ctx -> {
-            // To avoid an infinite loop, we don't cry havoc if the user is in
-            // the middle of an auth flow
-            if (ctx.url().equals(gOAuth.redirectUri)) {
-                System.out.println(">>>>>>> SETTING UP A NEW SESSION, at " + gOAuth.redirectUri);
-                return;
-            }
-            String gId = ctx.cookie("auth.gId");
-            String key = ctx.cookie("auth.key");
-            // We also don't cry havoc if the user is logged in
-            if (sessions.checkValid(gId, key)) {
-                return;
-            }
-            System.out.println(">>>>>>> INVALID SESSION, redirecting to " + gOAuth.newAuthUrl);
-            ctx.redirect(gOAuth.newAuthUrl);
-        });
-        // #endregion before
-
-        // All routes go here
-        // #region new_routes
-        // Handle Google oauth by extracting the "code" and authenticating it,
-        // then redirecting
-        app.get(Routes.RT_AUTH_GOOGLE_CALLBACK,
-                ctx -> Routes.authCallback(ctx, db, gson, sessions, gOAuth));
-        // Log out
-        app.get("/logout", ctx -> Routes.authLogout(ctx, gson, sessions));
-        // #endr egion new_routes
-        // Get a list of all the people in the system
-        app.get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
 
         // The only way to stop the server is by pressing ctrl-c. At that point,
         // the server should try to clean up as best it can.

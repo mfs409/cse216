@@ -80,17 +80,16 @@ So for now, while you're still getting everything to work, you should do lots of
 If you determine that the overhead of logging becomes burdensome, you can always *introduce an environment variable that controls the log level*.
 
 Right now there is only one environment variable, the port.
-Your computer has an IP address, such as 128.180.1.81.
+Your computer has an IP address, such as `128.180.1.81`.
 A computer can run many services, so many machines might try to contact the same address, for different purposes.
 Associating each service with a different port makes this whole process work.
-Some ports are standard, like 80 for unencrypted web traffic and 443 for encrypted web traffic.
+Some ports are standard, like `80` for unencrypted web traffic and `443` for encrypted web traffic.
 In this chapter, the only requirement is that you choose a port that isn't already in use on your computer.
-3000, 5000, and 8000 are common choices.
+`3000`, `5000`, and `8000` are common choices.
 
 Finally, you'll see that there are three steps to use Javalin.
 
 1. You `create` an app.
-   Right now, your app doesn't take any configuration information.
 2. You configure the different resources that the app provides, and how it provides them.
    For now, there is just one resource, the root resource (`/`).
 3. You call `app.start(port)` so your app will start responding to requests
@@ -107,7 +106,7 @@ You can read the code like this:
 ```java
 // in response to a GET request for '/', run a function that takes a single
 // argument called `ctx`, of type `Context`
-app.get("/", ctx -> {
+get("/", ctx -> {
     // This is inside the function to run.  It modifies ctx by setting the HTTP
     // status code and HTTP content type for the response
     ctx.status(200);
@@ -115,7 +114,7 @@ app.get("/", ctx -> {
     // ctx.result() sets some text that makes up the response to send back to
     // the machine that made the request
     ctx.result("hello");
-}); // '}' ended the function, and ')' ended the call to app.get().
+}); // '}' ended the function, and ')' ended the call to get().
 ```
 
 So then `app.get("/", ctx -> { /* ... */ })` is really saying "when there is a request for the root document, run the function between the `{}` braces, and pass in `ctx` as an argument to it."
@@ -141,7 +140,7 @@ Remember: you'll need to press `ctrl-c` from the terminal to stop your web serve
 
 ## 2.3. REST Routes
 
-REST is a design philosophy for creating web services, in which the server does not keep track of the state of the application.
+[REST](https://en.wikipedia.org/wiki/REST) is a design philosophy for creating web services, in which the server does not keep track of the state of the application.
 With REST, developers think of the server as maintaining a directory-like structure for all of the resources it manages:
 
 - To perform an action on a resource, a client sends the server a message that includes the resource name, a "verb" describing the action to perform, and some optional additional information
@@ -156,8 +155,8 @@ REST is also good for "scale out".
 Since the server is *stateless*, REST designs make it easy to start a few more servers when demand is high.
 Clients can seamlessly send requests to one server, or another, without there appearing to be any interruption in service.
 
-REST works because the HTTP protocol supports several verbs.
-Most notably, REST maps the `post`, `get`, `put`, and `delete` verbs of the [HTTP Protocol](https://en.wikipedia.org/wiki/HTTP) to `create`, `read`, `update`, and `delete` operations (CRUD).
+REST works because the [HTTP protocol](https://en.wikipedia.org/wiki/HTTP) supports several verbs.
+Most notably, REST maps the `post`, `get`, `put`, and `delete` verbs of the [HTTP Request Methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods) to `create`, `read`, `update`, and `delete` operations (CRUD).
 As you saw in Chapter 1, these correspond to the SQL commands `INSERT`, `SELECT`, `UPDATE`, and `DELETE`.
 The app you make in this chapter will use these four verbs.[^REST]
 Any request to read a resource, whether a web page or a computed value, uses `get`.
@@ -326,7 +325,7 @@ At the same time, you can make the global `Gson` instance that your routes will 
 
 <<< @/02_javalin/backend_03/src/main/java/quickstart/backend/App.java#dbconfig
 
-Finally, remove the `get` route for `"/"`, and then add a new routing section:
+Finally, remove the `get` route for `"/"`, and then add a new `get` endpoint for the `"/people"` resource:
 
 <<< @/02_javalin/backend_03/src/main/java/quickstart/backend/App.java#routes
 
@@ -342,7 +341,7 @@ This should go right before `app.start()`:
 
 It's time to test the code.
 If your server is still running, press `ctrl-c`.
-Then re-compile with `mvn package`, and then run the new version of your code with a command like `PORT=3000 DB_FILE=../db.db java -jar target/backend-1.0.jar` (make sure to use the path to your database from the previous tutorial step)!
+Then re-compile with `mvn package`, and then run the new version of your code with a command like `PORT=3000 DB_FILE=../db.db java -jar target/backend-1.0.jar` (make sure to use the path to your database from the previous Chapter!)
 
 Using another terminal window, try using `curl` to get the `/people` route:
 
@@ -385,7 +384,8 @@ Now, if you click on "Google Cloud" in the top left, you should be redirected to
 
 ![Google Cloud Console](./oauth_01.png)
 
-From the hamburger menu in the top left, choose "APIs and Services/Enabled APIs and services", then search for the "People" API and enable it.
+From the hamburger menu in the top left, choose "APIs and Services/Enabled APIs and services", click the "+ Enable APIs and services", then search for the "Google People API" and enable it.
+
 Then click "Credentials" on the left sidebar.
 Choose "Create Credentials" and then "OAuth Client Id".
 Start following the prompts, making sure to pick an "External" audience for now.
@@ -404,10 +404,12 @@ For the time being, save them into a file on your desktop.
 
 The secrets will need to be transmitted to your Javalin program through environment variables.
 That being the case, a common approach is to have a special `.env` file that contains *all* of your environment configuration.
-A best practice is to make a folder that is *not* checked into your repository, and keep your `.env` files in it.
+A best practice is to make a folder that is *not* checked into your repository (e.g. `local/`), and keep your `.env` files in it.
 In this way, the secrets will be conveniently located for running unit tests, but not uploaded to any server.
 
-To set this up, from the root of your repository, type the following commands:
+You may already have an entry in your `.gitignore` that ignores a `./local/` folder at the root of your repo.
+You might NOT have an entry that ignores any file ending in `*.env`.
+To set this up, from the root of your repository, type the following commands (of course, you may also modify the `.gitignore` directly):
 
 ```bash
 mkdir local
@@ -471,7 +473,8 @@ To get all of that, update your `pom.xml` file with the highlighted dependencies
 <<< @/02_javalin/backend_04/pom.xml#newdeps{1-20}
 
 :::warning Warning: Stay Up To Date!
-You should regularly check the [Maven Repository](https://mvnrepository.com/) to ensure you've got the latest versions of any libraries in your `pom.xml` file.
+You should regularly check the [Maven Repository](https://mvnrepository.com/) to ensure you've got the latest versions of any libraries in your `pom.xml` file.  
+Any easy way to check is by running `mvn versions:display-dependency-updates`
 :::
 
 Next, you will need to add some code to `Database.java`.
@@ -498,7 +501,7 @@ The code for getting the environment variables should go in `App.java`.
 The rest of the Google OAuth configuration will go in a new `GoogleOAuth.java` file.
 When it comes to the actual routes, those will go in `Routes.java`.
 
-Since the `CLIENT_ID` and `CLIENT_SECRET` are in an environment variables, you should add these lines to `App.java` right after the line for getting `DB_FILE` from the environment.
+Since the `CLIENT_ID` and `CLIENT_SECRET` are in environment variables, you should add these lines to `App.java` right after the line for getting `DB_FILE` from the environment.
 Note that you'll also need the name of the server, in order for Google OAuth to work nicely.
 
 <<< @/02_javalin/backend_04/src/main/java/quickstart/backend/App.java#new_env
@@ -529,11 +532,12 @@ Because you will need the routes used for authentication in a couple places, you
 
 And now in `App.java` you can create the `Sessions` object and the `GoogleOauth` object.
 It doesn't matter too much where you put this code, as long as it comes before the code that you're about to write.
-After the call to `Javalin.create()` is a good location.
+Before the call to `Javalin.create()` and after creation of the `gson` variable is a good location.
 
 <<< @/02_javalin/backend_04/src/main/java/quickstart/backend/App.java#sessions
 
-Next comes the part of the code that actually enforces authentication.
+Next comes the part of the code that actually enforces authentication; it can go anywhere in the `Javalin.create` lambda but consider adding it right after setting up the `config.requestLogger`.
+
 Javalin supports `before` handlers, which run before any `get`/`post`/`put`/`delete` is serviced.
 In this case, the `before` code extracts the user's Google Id and secret from cookies sent by the browser.
 These cookies will be sent on every request from the browser, so they're always available to check.
@@ -667,7 +671,7 @@ Wrapping that logic in `validate()` makes it easy to write the code once, and us
 
 <<< @/02_javalin/backend_05/src/main/java/quickstart/backend/Database.java#manage_names
 
-At this point, you should stop your server, recompile it (`mvn package`), and then use your script to re-start it (or otherwise set environment variables and launch manually).
+At this point, you should stop your server, recompile it (`mvn package`), and re-start it (can use a script, or otherwise set environment variables and launch manually).
 On any restart, you'll need to log in again (i.e. get a new `auth.gId`).
 Then use `curl` to interact with these routes (changing the argument to `-b` appropriately):
 

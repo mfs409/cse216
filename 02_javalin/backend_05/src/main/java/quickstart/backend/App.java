@@ -1,9 +1,11 @@
 package quickstart.backend;
 
 import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
 import java.sql.SQLException;
 
 import com.google.gson.*;
+
 
 /** A backend built with the Javalin framework */
 public class App {
@@ -48,6 +50,13 @@ public class App {
         // This date format works nicely with SQLite and PostgreSQL
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
+        // NB: `Sessions` makes the back end stateful. This should get migrated
+        // to a separate component, such as a memcache, so that it's possible to
+        // scale out the backend to multiple servers without users getting
+        // accidental logouts.
+        var sessions = new Sessions();
+        var gOAuth = new GoogleOAuth(serverName, port, clientId, clientSecret, Routes.RT_AUTH_GOOGLE_CALLBACK);
+
         // Create the web server. This doesn't start it yet!
         var app = Javalin.create(config -> {
             // Attach a logger
@@ -60,62 +69,55 @@ public class App {
                 if (ctx.body().length() > 0)
                     System.out.printf("request body:%s%n", ctx.body());
             });
+
+            // Every interaction with the server requires the user to be authenticated
+            config.routes.before(ctx -> {
+                // To avoid an infinite loop, we don't cry havoc if the user is in
+                // the middle of an auth flow
+                if (ctx.url().equals(gOAuth.redirectUri)) {
+                    System.out.println(">>>>>>> SETTING UP A NEW SESSION, at " + gOAuth.redirectUri);
+                    return;
+                }
+                String gId = ctx.cookie("auth.gId");
+                String key = ctx.cookie("auth.key");
+                // We also don't cry havoc if the user is logged in
+                if (sessions.checkValid(gId, key)) {
+                    return;
+                }
+                System.out.println(">>>>>>> INVALID SESSION, redirecting to " + gOAuth.newAuthUrl);
+                ctx.redirect(gOAuth.newAuthUrl);
+            });
+
+            // All routes go here
+            config.routes.apiBuilder(() -> {
+                // Handle Google oauth by extracting the "code" and authenticating it, then redirecting
+                get(Routes.RT_AUTH_GOOGLE_CALLBACK,
+                        ctx -> Routes.authCallback(ctx, db, gson, sessions, gOAuth));
+                // Log out
+                get("/logout", ctx -> Routes.authLogout(ctx, gson, sessions));
+                // Get a list of all the people in the system
+                get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
+                // #region manage_names
+                // Get all details for a specific person
+                get("/people/{id}", ctx -> Routes.readPersonOne(ctx, db, gson));
+                // Update the current user's name
+                put("/people", ctx -> Routes.updatePerson(ctx, db, gson, sessions));
+                // #endregion manage_names
+                
+                // #region messages
+                // Create a message
+                post("/messages", ctx -> Routes.createMessage(ctx, db, gson, sessions));
+                // Get a list of all the messages in the system
+                get("/messages", ctx -> Routes.readMessageAll(ctx, db, gson));
+                // Get all details for a specific message
+                get("/messages/{id}", ctx -> Routes.readMessageOne(ctx, db, gson));
+                // Update a message's fields
+                put("/messages/{id}", ctx -> Routes.updateMessage(ctx, db, gson, sessions));
+                // Delete a message
+                delete("/messages/{id}", ctx -> Routes.deleteMessage(ctx, db, gson, sessions));
+                // #endregion messages
+            });
         });
-
-        // NB: `Sessions` makes the back end stateful. This should get migrated
-        // to a separate component, such as a memcache, so that it's possible to
-        // scale out the backend to multiple servers without users getting
-        // accidental logouts.
-        var sessions = new Sessions();
-        var gOAuth = new GoogleOAuth(serverName, port, clientId, clientSecret, Routes.RT_AUTH_GOOGLE_CALLBACK);
-
-        // Every interaction with the server requires the user to be
-        // authenticated
-        app.before(ctx -> {
-            // To avoid an infinite loop, we don't cry havoc if the user is in
-            // the middle of an auth flow
-            if (ctx.url().equals(gOAuth.redirectUri)) {
-                System.out.println(">>>>>>> SETTING UP A NEW SESSION, at " + gOAuth.redirectUri);
-                return;
-            }
-            String gId = ctx.cookie("auth.gId");
-            String key = ctx.cookie("auth.key");
-            // We also don't cry havoc if the user is logged in
-            if (sessions.checkValid(gId, key)) {
-                return;
-            }
-            System.out.println(">>>>>>> INVALID SESSION, redirecting to " + gOAuth.newAuthUrl);
-            ctx.redirect(gOAuth.newAuthUrl);
-        });
-
-        // All routes go here
-        // Handle Google oauth by extracting the "code" and authenticating it,
-        // then redirecting
-        app.get(Routes.RT_AUTH_GOOGLE_CALLBACK,
-                ctx -> Routes.authCallback(ctx, db, gson, sessions, gOAuth));
-        // Log out
-        app.get("/logout", ctx -> Routes.authLogout(ctx, gson, sessions));
-        // Get a list of all the people in the system
-        app.get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
-        // #region manage_names
-        // Get all details for a specific person
-        app.get("/people/{id}", ctx -> Routes.readPersonOne(ctx, db, gson));
-        // Update the current user's name
-        app.put("/people", ctx -> Routes.updatePerson(ctx, db, gson, sessions));
-        // #endregion manage_names
-
-        // #region messages
-        // Create a message
-        app.post("/messages", ctx -> Routes.createMessage(ctx, db, gson, sessions));
-        // Get a list of all the messages in the system
-        app.get("/messages", ctx -> Routes.readMessageAll(ctx, db, gson));
-        // Get all details for a specific message
-        app.get("/messages/{id}", ctx -> Routes.readMessageOne(ctx, db, gson));
-        // Update a message's fields
-        app.put("/messages/{id}", ctx -> Routes.updateMessage(ctx, db, gson, sessions));
-        // Delete a message
-        app.delete("/messages/{id}", ctx -> Routes.deleteMessage(ctx, db, gson, sessions));
-        // #endregion messages
 
         // The only way to stop the server is by pressing ctrl-c. At that point,
         // the server should try to clean up as best it can.

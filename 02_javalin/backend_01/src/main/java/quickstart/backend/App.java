@@ -2,6 +2,7 @@ package quickstart.backend;
 
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 /** A backend built with the Javalin framework */
 public class App {
@@ -22,13 +23,16 @@ public class App {
         }
 
         // Create the web server. This doesn't start it yet!
-        var app = Javalin.create();
-
-        // When a client requests the root resource ('/'), return "hello"
-        app.get("/", ctx -> {
-            ctx.status(200);
-            ctx.contentType(ContentType.TEXT_PLAIN);
-            ctx.result("hello");
+        var app = Javalin.create( config -> {
+            // All routes go here
+            config.routes.apiBuilder(() -> {
+                // When a client requests the root resource ('/'), return "hello"
+                get("/", ctx -> {
+                    ctx.status(200);
+                    ctx.contentType(ContentType.TEXT_PLAIN);
+                    ctx.result("hello");
+                });
+            });
         });
 
         // This next line launches the server, so it can start receiving

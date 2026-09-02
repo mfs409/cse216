@@ -2,6 +2,7 @@ package quickstart.backend;
 
 import io.javalin.Javalin;
 import io.javalin.http.ContentType;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 /** A backend built with the Javalin framework */
 public class App {
@@ -23,8 +24,9 @@ public class App {
 
         // #region create
         // Create the web server. This doesn't start it yet!
-        var app = Javalin.create(config -> {
+        var app = Javalin.create( config -> {
             // Attach a logger
+            // TODO: Too much logging for production. Make verbosity adjustable.
             config.requestLogger.http((ctx, ms) -> {
                 System.out.println("=".repeat(80));
                 System.out.printf("%-6s%-8s%-25s%s%n", ctx.scheme(), ctx.method().name(), ctx.path(),
@@ -34,15 +36,18 @@ public class App {
                 if (ctx.body().length() > 0)
                     System.out.printf("request body:%s%n", ctx.body());
             });
+            
+            // All routes go here
+            config.routes.apiBuilder(() -> {
+                // When a client requests the root resource ('/'), return "hello"
+                get("/", ctx -> {
+                    ctx.status(200);
+                    ctx.contentType(ContentType.TEXT_PLAIN);
+                    ctx.result("hello");
+                });
+            });
         });
         // #endregion create
-
-        // When a client requests the root resource ('/'), return "hello"
-        app.get("/", ctx -> {
-            ctx.status(200);
-            ctx.contentType(ContentType.TEXT_PLAIN);
-            ctx.result("hello");
-        });
 
         // This next line launches the server, so it can start receiving
         // requests. Note that main will return, but the server keeps running.

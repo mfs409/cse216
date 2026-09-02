@@ -555,7 +555,7 @@ Fortunately, there's not much complexity to the code.
 There are only two things worth discussing.
 First, the code uses the try-with-resources pattern with the `AutoCloseable` `Database` object, so that you do not have to remember to close the database.
 Second, the name of the database file is provided through an environment variable.
-That means you will need to run the program with a shell command like `DB_FILE=db.db java -jar target/admin-1.0.jar`.
+That means you will need to run the program with a shell command like `DB_FILE=../db.db java -jar target/admin-1.0.jar`.
 Passing configuration through environment variables is a best practice for the web backend, so this code might as well do the same.
 
 Hopefully, you have been building and testing your code while working through these last few sections.

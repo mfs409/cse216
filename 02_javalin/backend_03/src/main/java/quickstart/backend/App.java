@@ -1,6 +1,7 @@
 package quickstart.backend;
 
 import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
 // #region import
 import java.sql.SQLException;
 import com.google.gson.*;
@@ -48,6 +49,7 @@ public class App {
         // Create the web server. This doesn't start it yet!
         var app = Javalin.create(config -> {
             // Attach a logger
+            // TODO: Too much logging for production. Make verbosity adjustable.
             config.requestLogger.http((ctx, ms) -> {
                 System.out.println("=".repeat(80));
                 System.out.printf("%-6s%-8s%-25s%s%n", ctx.scheme(), ctx.method().name(), ctx.path(),
@@ -57,13 +59,15 @@ public class App {
                 if (ctx.body().length() > 0)
                     System.out.printf("request body:%s%n", ctx.body());
             });
-        });
 
-        // #region routes
-        // All routes go here
-        // Get a list of all the people in the system
-        app.get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
-        // #endregion routes
+            // #region routes
+            // All routes go here
+            config.routes.apiBuilder(() -> {
+                // Get a list of all the people in the system
+                get("/people", ctx -> Routes.readPersonAll(ctx, db, gson));
+            });
+            // #endregion routes
+        });
 
         // #region shutdown
         // The only way to stop the server is by pressing ctrl-c. At that point,
