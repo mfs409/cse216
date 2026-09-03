@@ -67,6 +67,7 @@ public class App {
         // Create the web server. This doesn't start it yet!
         var app = Javalin.create(config -> {
             // Attach a logger
+            // TODO: Too much logging for production. Make verbosity adjustable.
             config.requestLogger.http((ctx, ms) -> {
                 System.out.println("=".repeat(80));
                 System.out.printf("%-6s%-8s%-25s%s%n", ctx.scheme(), ctx.method().name(), ctx.path(),
