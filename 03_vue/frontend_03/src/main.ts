@@ -1,12 +1,12 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
-import App from './App.vue'
+import App from './App.vue';
 // #region import
-import { router } from './router'
+import { router } from './router';
 // #endregion import
 
-import '@picocss/pico/css/pico.min.css'
+import '@picocss/pico/css/pico.min.css';
 
 const app = createApp(App)
 

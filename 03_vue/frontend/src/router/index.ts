@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import PersonAll from '@/PersonAll.vue'
-import MessageAll from '@/MessageAll.vue'
-import MessageOne from '@/MessageOne.vue'
-import MessageCreate from '@/MessageCreate.vue'
-import PersonOne from '@/PersonOne.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import PersonAll from '@/PersonAll.vue';
+import MessageAll from '@/MessageAll.vue';
+import MessageOne from '@/MessageOne.vue';
+import MessageCreate from '@/MessageCreate.vue';
+import PersonOne from '@/PersonOne.vue';
 
 /**
  * Routes helps avoid typing strings, so that we don't mis-type these in the

@@ -8,8 +8,8 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 // #region script
-import Menu from '@/Menu.vue'
+import Menu from '@/Menu.vue';
 // #endregion script
 </script>

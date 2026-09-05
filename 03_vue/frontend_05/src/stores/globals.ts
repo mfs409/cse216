@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref, type Ref } from "vue";
+import { defineStore } from 'pinia';
+import { ref, type Ref } from 'vue';
 
 /**
  * globals is a reactive data store, made with Pinia.  It holds all of the

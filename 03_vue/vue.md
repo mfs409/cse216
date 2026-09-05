@@ -67,12 +67,12 @@ Finally, in the lambda where you configure Javalin, after you finish attaching t
 <<< @/03_vue/backend_01/src/main/java/quickstart/backend/App.java#config
 
 This code does two things.
-First, it uses `config.staticFiles` to say that whenever a `GET` request cannot be satisfied by one of the data routes that you will set up below, the server should try to find a file that can do the job.
+First, it uses `config.staticFiles` to say that whenever a `GET` request cannot be satisfied by one of the data routes that you set up further down (in `config.routes.apiBuilder`), the server should instead try to find a file that can do the job.
 If the `STATIC_LOCATION` environment variable is set, it should try to find a matching file path/name in the given folder.
 Otherwise, it should look in the `jar` file.
 To get files into the jar, you'll need to put them in the `/src/main/resources/public` folder.
 
-Secondly, it uses `spaRoot` to indicate that when a matching static file cannot be found, you still want to send the main web page, instead of producing a 404 error.
+Secondly, it uses `spaRoot` to indicate that when a matching file cannot be found, you still want to send the main web page, instead of producing a 404 error.
 This provides a nicer user experience, because it means that the frontend can be a [single page app](https://en.wikipedia.org/wiki/Single-page_application) that lets the user refresh at any point and not lose their navigation history.
 Notice that the `spaRoot` path varies depending on whether the file is served from the filesystem or the jar.
 
@@ -82,8 +82,13 @@ You won't be touching this Java code again for a while.
 ## 3.3. Creating A Vue Project
 
 It's time to make the default Vue.js project.
-To do this, you will need to install [Node.js](https://nodejs.org/en).
+To do this, you will need to install [Node.js](https://nodejs.org/en).[^fnm]
 Then, in the root of your project (the folder where `admin`, `backend`, and `local` are sub-folders), type the following:
+
+[^fnm]:
+    If you are using node for multiple projects, you may need help managing node versions. Node Version Manager (`nvm`) was the recommended approach pre 2026.
+
+    We now recommend "Fast Node Manager" (`fnm`): a modern, Rust-based alternative to nvm that offers significantly faster performance and native cross-platform support. If you already have Node and choose to setup fnm, be aware that you must do so carefully, and it may take you a little more time than you expect.
 
 ```bash
 npm create vue@latest
@@ -93,9 +98,18 @@ You will need to answer a few questions:
 
 - Be sure to say `y` when asked "Ok to proceed?"
 - For the project name, type `frontend`.
-- For the features, use the up and down arrows, along with the space bar, to select `TypeScript`, `Router`, `Pinia`, `Vitest`, and `ESLint`, then press `Enter`
-- You don't need experimental features, so you can just press `Enter`
+- Say `Yes` to using TypeScript.
+- For the features, use the up and down arrows, along with the space bar, to select `Router`, `Pinia`, `Vitest`, and `Linter`, then press `Enter`
+- You don't need experimental features, so you can just press `Enter`.[^oxlint-bug]
 - Say `y` when asked about skipping example code
+- Do *not* do the "Optional: Initialize Git in your project directory..."
+
+[^oxlint-bug]:
+    Due to a recognized bug in the current `npm create vue@latest` setup, you will get an error on your first `npm install` whether or not you choose the experimental option **choose to "Replace Prettier with Oxfmt"**
+    
+    As of September 2026, [there is a known upstream packaging bug](https://github.com/oxc-project/eslint-plugin-oxlint/issues/761) with the current npm create vue@latest template. Even if you chose "No" to the experimental Oxlint option, the underlying Vue template generator still accidentally includes both oxlint and eslint-plugin-oxlint in your package.json, but with mismatched version ranges (~1.74.0 vs ~1.73.0).
+    
+    Because eslint-plugin-oxlint strictly requires its matching version of oxlint as a peer dependency, npm blocks the entire install process. This can be resolved by running `npm install -D oxlint@latest eslint-plugin-oxlint@latest`.
 
 This will produce a folder structure with 22 files in it.
 The most important is `package.json`.
@@ -103,6 +117,7 @@ It is like `pom.xml` in your Java projects.
 However, `npm` and `mvn` work a bit differently.
 Whereas maven would automatically fetch libraries any time the `pom.xml` file changed, `npm` requires you to explicitly fetch libraries any time `package.json` changes.
 This includes the very first time, so you should immediately type `cd frontend` and then `npm install` to fetch the dependencies for your program.
+If you see an error installing (yes, from a bare project!) related to `oxlint`, you can fix this by running `npm install -D oxlint@latest eslint-plugin-oxlint@latest`, followed by another `npm install`.
 
 ![Setting up a Vue project](../vhs/03_npm_01.gif)
 
@@ -115,15 +130,15 @@ This line will add the libraries that are used by the frontend:
 npm install @picocss/pico
 ```
 
-This will add add libraries that will be useful when building the code.  Since they won't be part of the app, just part of the build process, you should use the `--save-dev` flag:
+This will add libraries that will be useful when building the code.  Since they won't be part of the app, just part of the build process, you should use the `--save-dev` flag:
 
 ```bash
 npm install --save-dev rimraf copy-folder-util
 ```
 
 :::tip Regular vs Dev Dependencies
-Regular dependencies are for libraries that must be included as part of the app that you publish to the web.
-Dev dependencies are for tools that you need in order to build the app, but that don't ship with the final code.
+Regular dependencies are for libraries that must be included as part of the app that you publish to the web.  
+**Dev dependencies** are for tools that you need in order to build the app, but that *don't ship with the final code*.
 Examples of dev dependencies include the TypeScript-to-JavaScript compiler and the Vitest unit testing suite.
 :::
 
@@ -134,7 +149,7 @@ Finally, add two more lines to the `scripts` section of `package.json`:
     "clean": "rimraf dist/",
 ```
 
-:::warning Warning: Commas Matter
+:::warning Warning: **Commas Matter**
 `package.json` is *very picky* about commas.
 Any time you have a comma-separated list of values inside of `[]` or `{}` braces, the last element *must not* have a comma after it.
 :::
@@ -145,7 +160,7 @@ You can also type `npm run deploy` to copy the most recently built version of yo
 It's time to run your frontend.
 First, type `npm run build`.
 Then go to your backend folder, and start your web server.
-When you start it, be sure to include `STATIC_LOCATION=../frontend/dist` in the environment.
+When you start it, be sure to include `STATIC_LOCATION=../frontend/dist` in the environment, along with the environment variables your backend requires.
 For now, you might want to add this to your `local/backend.env` file, even though you'll need to remove it later.
 
 If you visit <localhost:3000>, you'll be asked to log in.
@@ -159,11 +174,12 @@ If you go to <localhost:3000/people>, you should receive some JSON data, indicat
 
 And if you go to <localhost:3000/invalid> -- or any other undefined endpoint -- you should see the home page.
 
-You should make sure you understand what just happened.
-When you enter an address into the browser, it issues a `GET` to the server.
-When the path of the `GET` matches one of your back-end data routes (via `app.get()`), then the corresponding code on the backend figures out how to reply.
-If none of those match, then if the path matches the name of a file in the static file path, then that file will be sent.
-And if nothing else matches, the `spaRoot` file will be sent instead of the typical behavior of a [`404 Not Found`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404).
+**You should make sure you understand what just happened:**
+
+1. When you enter an address into the browser, it issues a `GET` to the server.
+2. When the path of the `GET` matches one of your back-end data routes (via `app.get()`), then the corresponding code on the backend figures out how to reply.
+3. If none of those match, then if the path matches the name of a file in the static file path, then that file will be sent.
+4. And if nothing else matches, the `spaRoot` file will be sent instead of the typical behavior of a [`404 Not Found`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/404).
 
 ## 3.4. A First Component
 
@@ -176,7 +192,7 @@ Here's the script:
 <<< @/03_vue/frontend_02/src/PersonAll.vue#script
 
 :::tip Use Your IDE Well!
-If you are using Visual Studio Code as your IDE, then the first time you open a `.vue` file, it may ask if you wish to install the recommended 'Vue (Official)' extension.
+If you are using Visual Studio Code as your IDE, then the first time you open a `.vue` file, it may ask if you wish to install the recommended 'Vue (Official)' extension. You should do so.
 Usually, these extensions do a lot of behind-the-scenes work to help you avoid silly bugs, and to help you write code faster.
 However, you should always check the author and reviews before installing an extension.
 :::
@@ -232,7 +248,7 @@ To fix that, add this `<style>` section to `PersonAll.vue`:
 
 <<< @/03_vue/frontend_02/src/PersonAll.vue#style
 
-Now when you hover over a row, that row will be highlighted, and the cursor will change.
+Rebuild and refresh. Now when you hover over a row, that row will be highlighted, and the cursor will change.
 
 ## 3.5. Getting Started With Routing
 
@@ -250,7 +266,7 @@ Since the router now has two exports, you'll need to fix `main.ts`.
 Find this line:
 
 ```ts
-import router from './router'
+import router from './router';
 ```
 
 Replace it with this:
@@ -259,7 +275,7 @@ Replace it with this:
 
 Finally, update `App.vue` to use the router instead of directly using `PersonAll`:
 
-<<< @/03_vue/frontend_03/src/App.vue
+<<< @/03_vue/frontend_03/src/App.vue#update
 
 You should be able to test this code by typing `npm run build`, and then refreshing your browser.
 Nothing will look different, but now the component is being selected by the router, instead of being hard-coded.
@@ -307,7 +323,7 @@ Then, replace its contents with this:
 
 <<< @/03_vue/frontend_05/src/stores/globals.ts
 
-This code declares an object ('popup') that has some reactive state (`msg` and `header`).
+This code declares an object (`popup`) that has some reactive state (`msg` and `header`).
 It also has a reference to a component (via `element`).
 To make the component, create a new file called `src/Popup.vue`:
 
@@ -351,7 +367,7 @@ Testing errors is tricky, so the easiest way to make sure the popup is working i
 
 However, you don't really want a message when clicking a user's name.
 A better thing would be to make that click navigate to a component that shows the user's details.
-Start by adding this import:
+Start by adding this import (to PersonAll.vue):
 
 <<< @/03_vue/frontend_05/src/PersonAll.vue#import2{ts}
 
@@ -401,7 +417,7 @@ First, add these imports, so that the four new components are available:
 <<< @/03_vue/frontend_06/src/router/index.ts#imports
 
 Once that's in place, you can add these routes to the `routes` field in `createRouter`.
-(You'll probably also want to change the default route from `PersonAll` to `MessageAll`):
+(You'll probably also want to change the default (home) route from `PersonAll` to `MessageAll`):
 
 <<< @/03_vue/frontend_06/src/router/index.ts#routes
 
@@ -428,7 +444,7 @@ When you're happy with your work, you should commit it to your repository.
 Notice that when you created the app, a `.gitignore` was set up automatically, and it excluded `node_modules` and `dist`.
 
 As a last step, you should use `npm run build` followed by `npm run deploy` to compile the frontend and copy it to the `resources` folder of your backend.
-Then you can re-build the backend with `mvn package`, restart the backend *without `STATIC_FILES`*, and make sure that your program is going to behave correctly when you deploy it to the web.
+Then you can re-build the backend with `mvn package`, restart the backend *without `STATIC_FILES`* (e.g. if using your .env, add `unset STATIC_LOCATION` after the variable is set, and `source` the file again), and make sure that your program is going to behave correctly when you deploy it to the web.
 
 ## 3.10. Getting Ready For Chapter 4
 
