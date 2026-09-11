@@ -17,12 +17,13 @@ The changes you'll make to your app in this chapter help to align with the [12 F
 In this tutorial, wherever you see `quickstart` as the project name, you should (nearly always) replace it with the project name you chose or was given to you.
 
 The only exceptions to this rule may be
-1. in your database url (i.e. the final portion must use underscores rather than dashes), and 
+
+1. in your database url (i.e. the final portion must use underscores rather than dashes), and
 2. your java package name (i.e. `package quickstart.backend;`, if you changed that to use your team name.
 
-For example, assume your project name on dokku is of the form   
+For example, assume your project name on dokku is of the form  
 `<year><sp|fa>-tutorial-<uid>`, as in  
-`2026sp-tutorial-sml3`.  
+`2026fa-tutorial-sml3`.  
 
 Then, wherever you see `quickstart` as the dokku project name, you would instead use your project name.[^qs_examples]
 :::
@@ -84,11 +85,20 @@ As you work through this chapter, please note that the CSE Dokku servers are onl
     - `ssh -t dokku@dokku.cse.lehigh.edu 'postgres:link quickstart quickstart'`
 
 To ensure that your ssh keys are correctly configured, and to see the initial configuration of your app, connect to dokku and run the `config:export` command.
-You can do this by typing:
+You can do this by typing (from your local dev environment, not from the dokku host):
 
 ```bash
 ssh -t dokku@dokku.cse.lehigh.edu 'config:export quickstart'
 ```
+
+<!-- for tutorial admins: you'll want to stop ssh agent forwarding so you can test that student-like access works, e.g.
+ssh -a -i ~/.ssh/id_ed25519_dokku_stevetest dokku@dokku.cse.lehigh.edu 'config:export 2026fa-tutorial-stevetest'
+-->
+
+:::warning Warning: You must use `dokku@`, not your own uid!
+Dokku uses your ssh key to determine who you are.
+Therefore, you should *not* use your personal uid for these `ssh` or `git clone` commands and instead leave the user as `dokku@` as shown.
+:::
 
 The result should look like this:
 
@@ -97,7 +107,7 @@ The result should look like this:
 You hopefully recognize what's happening here: Dokku is ready to pass configuration information to your app through environment variables.
 Furthermore, there is one environment variable already set up for you: the URL for a pre-configured PostgreSQL database.
 
-Using the command line, you can set and unset environment variables:
+Using the command line (again, from your localhost), you can set and unset environment variables:
 
 ```bash
 ssh -t dokku@dokku.cse.lehigh.edu 'config:set quickstart DATABASE_FILE=db.db'
@@ -163,7 +173,7 @@ You'll want the result to look like this:
 
 ```text
 .
-├── ccse216
+├── cse216
 │   ├── admin
 │   │   └── ...
 │   ├── backend
@@ -181,11 +191,15 @@ You'll want the result to look like this:
     └── .gitignore
 ```
 
-In terms of *how* to make that `dokku-tutorial` folder, you can simply clone it from the Dokku server:
+In terms of *how* to make that `dokku-tutorial` folder, you can simply clone it from the Dokku server (be sure you are *not* in the folder containing your tutorial work -- i.e. you should clone so the dokku-tutorial folder is a sibling of the cse216 folder):
 
 ```bash
 git clone dokku@dokku.cse.lehigh.edu:quickstart dokku-tutorial
 ```
+
+<!-- for tutorial admins: again you'll want to stop ssh agent forwarding so you can test that student-like access works, e.g.
+git clone dokku@dokku.cse.lehigh.edu:2026fa-tutorial-stevetest dokku-tutorial --config core.sshCommand="ssh -a -i ~/.ssh/id_ed25519_dokku_stevetest -o IdentitiesOnly=yes"
+-->
 
 The result should look like this:
 
@@ -220,7 +234,10 @@ The output will also report the URIs for your app.
 
 ![Pushing to the Dokku repository launches the web site](../vhs/04_dokku_04.gif)
 
-When you visit <http://quickstart.dokku.cse.lehigh.edu> in your browser, you should see your static site:
+When you visit <http://quickstart.dokku.cse.lehigh.edu> in your browser, you should see your static site:[^refresh]
+
+[^refresh]:
+    A simple refresh of the page usually does the job, but at times you may have to "hard refresh" to bypass your cache.
 
 ![The static web site is live](./chrome_03.png)
 
@@ -278,14 +295,29 @@ Instead of using the default port, you will run a command to expose the port and
 ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:expose quickstart'
 ```
 
-And, depending upon how the dokku host is configured, you should be able to see the full URL to modify by running:
+The new externally exposed host port comes after the container's port, for example `11111` in the message `exposed on port(s) [container->host]: 5432->11111`.
+
+<!-- for tutorial maintainers:
+ssh -a -i ~/.ssh/id_ed25519_dokku_stevetest -t -q dokku@dokku.cse.lehigh.edu 'postgres:expose 2026fa-tutorial-stevetest'
+-->
+
+And, depending upon how the dokku host is configured, you should be able to see the URL to modify (as `Dsn:`) by running:
 
 ```bash
 ssh -t -q dokku@dokku.cse.lehigh.edu 'postgres:info quickstart'
 ```
 
-Then you can build a valid URI for accessing your database.
-If your appname has dashes in it (e.g. `2026sp-tutorial-uid123`), you will have to change the final portion of the url to use underscores instead, for example:
+<!-- for tutorial maintainers:
+ssh -a -i ~/.ssh/id_ed25519_dokku_stevetest -t -q dokku@dokku.cse.lehigh.edu 'postgres:info 2026fa-tutorial-stevetest'
+-->
+
+Then you can build a valid URI for accessing your database by:
+
+1. adding `.dokku.cse.lehigh.edu` after your app name and just before the `:` that precedes the port.
+2. changing the port from `:5432` to the port you externally exposed
+3. ensuring that if your appname has dashes in it (e.g. `2026fa-tutorial-uid123`), you change the final portion of the url to use underscores instead
+
+Here's an example of a valid URI that follows the rules above (observe each of points 1-3):
 
 ```bash
 postgres://postgres:abcdefghijklmnopqrstuvwxyz123456@dokku-postgres-2026sp-tutorial-uid123.dokku.cse.lehigh.edu:13543/2026sp_tutorial_uid123
@@ -337,10 +369,12 @@ Finally, change the line for constructing the database object:
 
 <<< @/04_dokku/admin_01/src/main/java/quickstart/admin/App.java#db_construct
 
-When you type `mvn package`, you'll discover that your unit tests are failing due to an "unresolved compilation problem".
+When you type `mvn package`, you'll discover two things.
+First, it won't compile because you changed the constructor in Database.java to take two arguments and your unit tests in `AppTest.java` still expect one argument; fix that by passing `false` in the `AppTest.initAll` method.
+Next, you will find that your unit tests are failing due to an "unresolved compilation problem" or "java.sql.SQLException: No suitable driver found for db.db_junit_*.db".
 That makes sense, since your unit tests were designed for a SQLite database, and now your database is supposed to use PostgreSQL.
 You **should not** simply replace each unit test's body with `assertTrue(true);`.[^use_backlog]
-Instead, you should mark the whole class with the `@Disabled` annotation:[^rethink_testing]
+Instead, you should mark the whole class with the `@Disabled` annotation by putting this before the `public class AppTest {` statement:[^rethink_testing]
 
 <<< @/04_dokku/admin_01/src/test/java/quickstart/admin/AppTest.java#disable_class
 

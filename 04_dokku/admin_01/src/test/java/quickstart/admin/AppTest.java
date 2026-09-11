@@ -57,7 +57,7 @@ public class AppTest {
         assertFalse(dbFile.length() == 0, "DB_FILE should be 1 or more characters.");
         dbFileName = String.format("%s_junit_%d.db", dbFile, System.currentTimeMillis());
         try {
-            assertDoesNotThrow(() -> db = new Database(dbFileName), "Exception thrown while creating test db.");
+            assertDoesNotThrow(() -> db = new Database(false, dbFileName), "Exception thrown while creating test db.");
         } catch (Exception e) {
             System.err.println("ERROR: AppTest.initAll failed to establish test database connection.");
         }
